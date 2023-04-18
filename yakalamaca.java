@@ -7,13 +7,13 @@ import java.util.Random;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-public class Main implements KeyListener {
+public class yakalamaca implements KeyListener {
     JFrame frame;
     JLabel mLabel;
     ArrayList<JLabel> mLabelList = new ArrayList<JLabel>();
     JLabel cLabel = new JLabel();
 
-    Main() {
+    yakalamaca() {
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 500);
@@ -55,7 +55,7 @@ public class Main implements KeyListener {
 
     }
 
-    class Monster extends Thread { 
+    class Monster extends Thread { // extends JLabel
         private int x;
         private int y;
         private JLabel ownLabel;
@@ -138,6 +138,7 @@ public class Main implements KeyListener {
                 int fark_x = c_x - x;
                 int fark_y = c_y - y;
                 Random rand = new Random();
+                // System.out.println(Thread.currentThread().getName());
                 if (fark_x < 0 && fark_y < 0) {
                     int temp = rand.nextInt(2);
                     if (temp == 0) {
@@ -197,7 +198,14 @@ public class Main implements KeyListener {
             }
             isCatch();
 
-            
+            /*
+             * else {
+             * setX(cLabel.getX());
+             * setY(cLabel.getY());
+             * System.out.println("game over");
+             * System.exit(0);
+             * }
+             */
             ownLabel.setBounds(x, y, 20, 20);
 
         }
@@ -208,47 +216,45 @@ public class Main implements KeyListener {
             yaklas();
 
             try {
-                Monster.sleep(500);
-                
+                Monster.sleep(1000);
+                // System.out.println(Thread.currentThread().getName()+" x: "+x+" y: "+y);
                 run();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            
+            // System.out.println(Monster.currentThread().getName()+": x->"+x+" y->"+y);
 
         }
 
     }
 
     public static void main(String[] args) {
-		
-		int number_of_monsters = Integer.parseInt(args[0]);
-		System.out.println(number_of_monsters);
-		Main m = new Main();
-		
-		Main.Monster [] monsters = new Main.Monster[number_of_monsters];
-		
-		Random r = new Random();
-		
-		for(int i=0;i<number_of_monsters;i++)
-		{
-			monsters[i] = m.new Monster(Math.abs(r.nextInt()%500),Math.abs(r.nextInt()%500));		
-		}
-		
-		for(int i=0;i<number_of_monsters;i++)
-			monsters[i].start();
-		
-		try {
-			for(int i=0;i<number_of_monsters;i++)
-				monsters[i].join();
-		} catch (InterruptedException e) {
-	
-			e.printStackTrace();
-		}
-		
-		
+        // bunu unutma!!!
+        // int number_of_monsters = Integer.parseInt(args[0]);
+        int number_of_monsters = 10;
+        System.out.println(number_of_monsters);
+        yakalamaca m = new yakalamaca();
 
-	}
+        yakalamaca.Monster[] monsters = new yakalamaca.Monster[number_of_monsters];
+
+        Random r = new Random();
+
+        for (int i = 0; i < number_of_monsters; i++) {
+            monsters[i] = m.new Monster(Math.abs(r.nextInt() % 500), Math.abs(r.nextInt() % 500));
+        }
+
+        for (int i = 0; i < number_of_monsters; i++)
+            monsters[i].start();
+
+        try {
+            for (int i = 0; i < number_of_monsters; i++)
+                monsters[i].join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void moveEnemy() {
         for (JLabel l : mLabelList) {
             Random r = new Random();
@@ -279,7 +285,7 @@ public class Main implements KeyListener {
             int cy = cLabel.getY();
             for (int tempX = mLabel.getX(); tempX < mLabel.getX() + 20; tempX++) {
                 for (int tempY = mLabel.getY(); tempY < mLabel.getY() + 20; tempY++) {
-                    if (tempX > cx && tempX < cx + 20 && tempY > cy && tempY < cy + 20) {
+                    if (tempX >= cx && tempX <= cx + 20 && tempY >= cy && tempY <= cy + 20) {
                         return true;
                     }
 
@@ -291,28 +297,39 @@ public class Main implements KeyListener {
         return false;
 
     }
+    public boolean carptinMi(int cx,int cy){
+        for (JLabel l : mLabelList){
+            int tempX = l.getX();
+            int tempY = l.getY();
+            if (tempX >= cx && tempX <= cx + 25 && tempY >= cy && tempY <= cy + 25) {
+                System.out.println("carptin!!!");
+                return true;
+            }
+        }
+        return false;
+    }
 
-  
+    // iclerinden gecebilyorum onu cozmem lazim
 
     @Override
     public void keyTyped(KeyEvent e) {
         switch (e.getKeyChar()) {
             case 'a':
-                if ((!icindenGeciyoMu()) && sinirdaMi(cLabel.getX() - 10, cLabel.getY()))
+                if ((!icindenGeciyoMu()) && sinirdaMi(cLabel.getX() - 10, cLabel.getY())&& !carptinMi(cLabel.getX() - 10, cLabel.getY()))
                     cLabel.setLocation(cLabel.getX() - 10, cLabel.getY());
                 break;
             case 'w':
-                if ((!icindenGeciyoMu()) && sinirdaMi(cLabel.getX(), cLabel.getY() - 10))
+                if ((!icindenGeciyoMu()) && sinirdaMi(cLabel.getX(), cLabel.getY() - 10)&& !carptinMi(cLabel.getX(), cLabel.getY() - 10))
                     cLabel.setLocation(cLabel.getX(), cLabel.getY() - 10);
 
                 break;
             case 's':
-                if ((!icindenGeciyoMu()) && sinirdaMi(cLabel.getX(), cLabel.getY() + 10))
+                if ((!icindenGeciyoMu()) && sinirdaMi(cLabel.getX(), cLabel.getY() + 10)&& !carptinMi(cLabel.getX(), cLabel.getY() + 10))
                     cLabel.setLocation(cLabel.getX(), cLabel.getY() + 10);
 
                 break;
             case 'd':
-                if ((!icindenGeciyoMu()) && sinirdaMi(cLabel.getX() + 10, cLabel.getY()))
+                if ((!icindenGeciyoMu()) && sinirdaMi(cLabel.getX() + 10, cLabel.getY())&& !carptinMi(cLabel.getX()+10, cLabel.getY()))
                     cLabel.setLocation(cLabel.getX() + 10, cLabel.getY());
 
                 break;
@@ -322,13 +339,13 @@ public class Main implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-    
+        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        
+        // TODO Auto-generated method stub
 
     }
 
